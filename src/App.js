@@ -15,12 +15,10 @@ const App = () => {
   const [tracks, setTracks] = useState("")
   const [songsloaded, setSongsloaded] = useState(false)
   const [currentTrack, setCurrentTrack] = useState(null)
-  const [timeoutId, setTimeoutId] = useState()
 
   const newTrack = tracksList => {
     const randomIndex = getRandomNumber(tracksList.length)
     setCurrentTrack(tracksList[randomIndex].track)
-    setTimeoutId(setTimeout(() => newTrack(tracksList), 30000))
   }
 
   useEffect(() => {
