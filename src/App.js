@@ -58,7 +58,7 @@ const App = () => {
 
   const checkAnswer = id => {
     if (currentTrack.id === id) {
-      swal("Bravo !", "Tu as gagné", "success").then(() => newTrack)
+      swal("Bravo !", "Tu as gagné", "success").then(() => newTrack(tracks))
     } else {
       swal("Essaye encore", "Ce n’est pas la bonne réponse", "error")
     }
