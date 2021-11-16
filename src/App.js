@@ -9,13 +9,20 @@ import AlbumCover from "./AlbumCover"
 
 // Get token from https://developer.spotify.com/console/get-current-user-saved-tracks/
 const apiToken =
-  "BQA0dVfO-iKw3QgDU1rHUGFh96HQD2gp0jwta8O5suHBivrdrRwK8WhFH4sVwSz-X00zn-wT5Wbzh52FOC5VQcn1wEEIYBH4D3XyPNBb3dJjjoKSnXrLX8gsoliKMCRvH3Id-2sY9kRJAZ6A7H-YBhrcrIpRxmGHeOaUH6JArpGkDGLx"
+  "BQCJhZ-HiVUn3sC84Jb7vRLJdzeBU1lnJ390rARzdJZQ0_rgFCH8kux1jnTWjXK9RP32HvtIAGZyos19sMOGgj96uTwk-pH-QoRjZHZWOv3MUvR3PEK05VUzKTvfss7twzJxKVfwq3MQehZIktRWE4hZikoGnQfhz64OL9OFP4IVhwYx"
 
 const App = () => {
-  const [text, setText] = useState("")
   const [tracks, setTracks] = useState("")
   const [songsloaded, setSongsloaded] = useState(false)
   const [currentTrack, setCurrentTrack] = useState(null)
+  const [timeoutId, setTimeoutId] = useState()
+
+  const newTrack = tracksList => {
+    const randomIndex = getRandomNumber(tracksList.length)
+    setCurrentTrack(tracksList[randomIndex].track)
+    setTimeoutId(setTimeout(() => newTrack(tracksList), 30000))
+  }
+
   useEffect(() => {
     fetch("https://api.spotify.com/v1/playlists/64AniTREImifrBpJNwW8FB/tracks", {
       method: "GET",
@@ -26,11 +33,9 @@ const App = () => {
       .then(response => response.json())
       .then(data => {
         console.log("Réponse reçue ! Voilà ce que j'ai reçu : ", data)
-        setText("Reçu !")
         setTracks(data.items)
+        newTrack(tracks)
         setSongsloaded(true)
-        const randomIndex = getRandomNumber(data.items.length)
-        setCurrentTrack(data.items[randomIndex].track)
       })
   }, [])
 
@@ -49,9 +54,11 @@ const App = () => {
   const track2 = tracks[randomIndex1].track
   const track3 = tracks[randomIndex2].track
 
-  const checkAnswer = ({ id }) => {
-    if (id === currentTrack.id) {
-      swal("Bravo !", "Tu as gagné", "success")
+  const propositions = shuffleArray([track1, track2, track3])
+
+  const checkAnswer = id => {
+    if (currentTrack.id === id) {
+      swal("Bravo !", "Tu as gagné", "success").then(() => newTrack)
     } else {
       swal("Essaye encore", "Ce n’est pas la bonne réponse", "error")
     }
@@ -62,28 +69,20 @@ const App = () => {
       <header className={styles.appHeader}>
         <img src={logo} className={styles.appLogo} alt="logo" />
         <h1 className={styles.appTitle}>Le meilleur Blindtest</h1>
-        <Button onClick={() => setText("Cliqué !")}>Cliquez moi !</Button>
-        <p>{text}</p>
       </header>
       <div className={styles.appImages}>
         <p>Nous avons chargé {tracks.length} chansons.</p>
-        <p>Titre de la première chanson : {tracks[0].track.name}.</p>
-        <AlbumCover track={currentTrack} />
+      </div>
+      <div>
         <audio controls autoPlay src={track1.preview_url} />
       </div>
       <div className={styles.appButtons}>
-        <Button onClick={() => checkAnswer(track1.id)}>
-          <AlbumCover track={track1} />
-          <div>{track1.name}</div>
-        </Button>
-        <Button onClick={() => checkAnswer(track2.id)}>
-          <AlbumCover track={track2} />
-          <div>{track2.name}</div>
-        </Button>
-        <Button onClick={() => checkAnswer(track3.id)}>
-          <AlbumCover track={track3} />
-          <div>{track3.name}</div>
-        </Button>
+        {propositions.map(track => (
+          <Button onClick={() => checkAnswer(track.id)}>
+            <AlbumCover track={track} />
+            <div>{track.name}</div>
+          </Button>
+        ))}
       </div>
     </div>
   )

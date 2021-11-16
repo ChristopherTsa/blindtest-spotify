@@ -2,7 +2,7 @@
   "name": "blindtest-spotify",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ChristopherTsa.github.io/blindtest-spotify/",
+  "homepage": "https://christophertsa.github.io/blindtest-spotify/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
