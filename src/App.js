@@ -34,7 +34,7 @@ const App = () => {
       .then(data => {
         console.log("Réponse reçue ! Voilà ce que j'ai reçu : ", data)
         setTracks(data.items)
-        newTrack(tracks)
+        newTrack(data.items)
         setSongsloaded(true)
       })
   }, [])
