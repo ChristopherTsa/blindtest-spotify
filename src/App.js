@@ -9,7 +9,7 @@ import AlbumCover from "./AlbumCover"
 
 // Get token from https://developer.spotify.com/console/get-current-user-saved-tracks/
 const apiToken =
-  "BQDiU2zr-Y-ZU1NF3lfVXcmz1o75ckt8Z5GwNh70eY4RuLcZfbaP8-azyrf-Z6Ngi33WQZbd3u07MNwrSVwdMFdu6ZHpbNacDvuc1YQ2S8GM6pk_vLM6acA4pecZBFP9YWs6sKHfMorcgjcl8B43qhyaEp2cm6ltbrdenDv27RvlmU7B"
+  "BQCySmxSJQBZLtx9qV5RyzxQ7zkAhNHu-YdN8ttfyqO261yppQHf7oTydfgAPWfe-kzpC9ZVAjmiCDUnTQR5VHtoQBTWWiKOUlgo0ItBogxIXmHB0WwXm1hiUyfewY7uvymIs15RykGdzaC819pjKaGYZ1YMnJPW7vQdwpXrS1-MzlHy"
 
 const App = () => {
   const [tracks, setTracks] = useState("")
