@@ -1,28 +1,40 @@
-import { useEffect, useState } from "react"
-import swal from "sweetalert"
+/*global swal*/
+
+import React, { useState, useEffect } from "react"
 import logo from "./logo.svg"
 import loading from "./loading.svg"
-import styles from "./App.module.css"
+import "./App.css"
+import Sound from "react-sound"
 import Button from "./Button"
-import { shuffleArray, getRandomNumber } from "./utils"
 import AlbumCover from "./AlbumCover"
 
-// Get token from https://developer.spotify.com/console/get-current-user-saved-tracks/
 const apiToken =
   "BQCySmxSJQBZLtx9qV5RyzxQ7zkAhNHu-YdN8ttfyqO261yppQHf7oTydfgAPWfe-kzpC9ZVAjmiCDUnTQR5VHtoQBTWWiKOUlgo0ItBogxIXmHB0WwXm1hiUyfewY7uvymIs15RykGdzaC819pjKaGYZ1YMnJPW7vQdwpXrS1-MzlHy"
 
-const App = () => {
-  const [tracks, setTracks] = useState([])
-  const [songsLoaded, setSongsLoaded] = useState(false)
-  const [currentTrack, setCurrentTrack] = useState(null)
-  const [timeoutId, setTimeoutId] = useState()
+function shuffleArray(array) {
+  let counter = array.length
 
-  const chooseNewTrack = tracksList => {
-    const randomIndex = getRandomNumber(tracksList.length)
-    setCurrentTrack(tracksList[randomIndex].track)
-    setTimeoutId(setTimeout(() => chooseNewTrack(tracksList), 30000))
+  while (counter > 0) {
+    let index = getRandomNumber(counter)
+    counter--
+    let temp = array[counter]
+    array[counter] = array[index]
+    array[index] = temp
   }
 
+  return array
+}
+
+/* Return a random number between 0 included and x excluded */
+function getRandomNumber(x) {
+  return Math.floor(Math.random() * x)
+}
+
+const App = () => {
+  const [tracks, setTracks] = useState()
+  const [songsLoaded, setSongsLoaded] = useState(false)
+  const [currentTrack, setCurrentTrack] = useState(null)
+  let timeout
   useEffect(() => {
     fetch(`https://api.spotify.com/v1/playlists/37i9dQZF1DWWl7MndYYxge/tracks`, {
       method: "GET",
@@ -33,24 +45,37 @@ const App = () => {
       .then(response => response.json())
       .then(data => {
         setTracks(data.items)
-        chooseNewTrack(data.items)
+        const randomIndex = getRandomNumber(data.items.length)
+        setCurrentTrack(data.items[randomIndex].track)
         setSongsLoaded(true)
       })
   }, [])
 
+  useEffect(() => {
+    timeout = setTimeout(() => getNewTrack(), 30000)
+  })
+
   const checkAnswer = id => {
     if (currentTrack.id === id) {
-      clearTimeout(timeoutId)
-      swal("Bravo !", "Tu as gagné", "success").then(() => chooseNewTrack(tracks))
+      clearTimeout(timeout)
+      swal("Bravo !", "Tu as gagné", "success").then(() => getNewTrack())
     } else {
       swal("Essaye encore", "Ce n’est pas la bonne réponse", "error")
     }
   }
 
+  const getNewTrack = () => {
+    if (!tracks) {
+      return
+    }
+    const randomIndex = getRandomNumber(tracks.length)
+    setCurrentTrack(tracks[randomIndex].track)
+  }
+
   if (!songsLoaded) {
     return (
-      <div className={styles.app}>
-        <img src={loading} className={styles.appLogo} alt="logo" />
+      <div className="App">
+        <img src={loading} className="App-logo" alt="logo" />
       </div>
     )
   }
@@ -65,21 +90,18 @@ const App = () => {
   const propositions = shuffleArray([track1, track2, track3])
 
   return (
-    <div className={styles.app}>
-      <header className={styles.appHeader}>
-        <img src={logo} className={styles.appLogo} alt="logo" />
-        <h1 className={styles.appTitle}>Bienvenue sur le Blindtest</h1>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <h1 className="App-title">Bienvenue sur le Blindtest</h1>
       </header>
-      <div className={styles.appImages}>
-        <p>Nous avons chargé {tracks.length} chansons.</p>
-        <audio controls autoPlay src={currentTrack.preview_url} />
+      <div className="App-images">
+        <AlbumCover track={track1} />
+        <Sound url={track1.preview_url} playStatus={Sound.status.PLAYING} />
       </div>
-      <div className={styles.appButtons}>
+      <div className="App-buttons">
         {propositions.map(track => (
-          <Button onClick={() => checkAnswer(track.id)}>
-            <AlbumCover track={track} />
-            <div>{track.name}</div>
-          </Button>
+          <Button onClick={() => checkAnswer(track.id)}>{track.name}</Button>
         ))}
       </div>
     </div>
